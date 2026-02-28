@@ -1,3 +1,5 @@
+import { log } from './logger';
+
 export class TemplateEngine {
   /**
    * Replace template variables in a string
@@ -13,7 +15,7 @@ export class TemplateEngine {
       const value = this.resolveValue(trimmedKey, variables);
       
       if (value === undefined || value === null) {
-        console.warn(`Warning: Template variable '${trimmedKey}' is undefined`);
+        log.warn(`Warning: Template variable '${trimmedKey}' is undefined`);
         return match; // Keep original placeholder if not found
       }
 

@@ -1,5 +1,6 @@
 import { Backend, PromptResult, StreamCallback } from './backend';
 import { spawn } from 'child_process';
+import { log } from './logger';
 
 /**
  * SubprocessBackend - Execute prompts by invoking a subprocess
@@ -105,7 +106,7 @@ export class SubprocessBackend extends Backend {
           try {
             structured = JSON.parse(output.trim());
           } catch (error) {
-            console.warn('Failed to parse structured output as JSON');
+            log.warn('Failed to parse structured output as JSON');
           }
         }
 

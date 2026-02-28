@@ -5,3 +5,4 @@ export { PromptFileParser, PromptFile } from './prompt-parser';
 export { TemplateEngine } from './template-engine';
 export { WorkflowExecutor, ExecutionOptions, ExecutionResult } from './executor';
 export { SubprocessBackend, SubprocessConfig } from './subprocess-backend';
+export { OpenCodeBackend, OpenCodeConfig } from './opencode-backend';

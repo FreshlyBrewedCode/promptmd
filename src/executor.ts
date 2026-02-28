@@ -2,6 +2,7 @@ import { Backend, PromptResult, StreamCallback } from './backend';
 import { Workflow } from './workflow-parser';
 import { PromptFileParser } from './prompt-parser';
 import { TemplateEngine } from './template-engine';
+import { log } from './logger';
 
 export interface ExecutionOptions {
   variables?: Record<string, any>;
@@ -55,7 +56,7 @@ export class WorkflowExecutor {
             // Optional: could add completion logging
           },
           onError: (error) => {
-            console.error('Streaming error:', error);
+            log.error('Streaming error: ' + error);
           }
         } : undefined;
 
@@ -72,7 +73,7 @@ export class WorkflowExecutor {
           variables.input = result.content;
         }
       } catch (error) {
-        console.error(`Error executing step '${step.prompt}':`, error);
+        log.error(`Error executing step '${step.prompt}': ` + error);
         return {
           success: false,
           results
@@ -96,7 +97,7 @@ export class WorkflowExecutor {
 
     for (let i = 0; i < loopConfig.count; i++) {
       iterations++;
-      console.log(`\nIteration ${iterations}/${loopConfig.count}`);
+      log.verbose(`\nIteration ${iterations}/${loopConfig.count}`);
 
       const result = await this.executeOnce(workflow, options);
 
@@ -114,7 +115,7 @@ export class WorkflowExecutor {
       if (loopConfig.exitOn && result.results.length > 0) {
         const lastResult = result.results[result.results.length - 1];
         if (this.checkExitCondition(lastResult, loopConfig.exitOn)) {
-          console.log(`Exit condition met: ${loopConfig.exitOn}`);
+          log.verbose(`Exit condition met: ${loopConfig.exitOn}`);
           break;
         }
       }
@@ -153,20 +154,20 @@ export class WorkflowExecutor {
       const prompts = PromptFileParser.loadDirectory(dirPath);
 
       if (prompts.length === 0) {
-        console.warn(`No prompt files found in directory: ${dirPath}`);
+        log.warn(`No prompt files found in directory: ${dirPath}`);
         return {
           success: false,
           results: []
         };
       }
 
-      console.log(`Found ${prompts.length} prompt(s) in directory`);
+      log.verbose(`Found ${prompts.length} prompt(s) in directory`);
 
       const results: PromptResult[] = [];
       const variables = { ...options.variables };
 
       for (const { name, prompt } of prompts) {
-        console.log(`\nExecuting: ${name}`);
+        log.info(`\nExecuting: ${name}`);
 
         const renderedPrompt = TemplateEngine.render(prompt.content, variables);
         
@@ -177,7 +178,7 @@ export class WorkflowExecutor {
             // Optional: could add completion logging
           },
           onError: (error) => {
-            console.error('Streaming error:', error);
+            log.error('Streaming error: ' + error);
           }
         } : undefined;
 
@@ -198,7 +199,7 @@ export class WorkflowExecutor {
         results
       };
     } catch (error) {
-      console.error(`Error executing directory '${dirPath}':`, error);
+      log.error(`Error executing directory '${dirPath}': ` + error);
       return {
         success: false,
         results: []

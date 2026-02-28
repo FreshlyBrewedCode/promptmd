@@ -31,19 +31,25 @@ promd <workflow> [options]
 
 ```
 src/
-├── cli.ts              # Main CLI entry point with Commander.js
-├── backend.ts          # Abstract Backend class for prompt execution
-├── config.ts           # Config file loader (~/.promd, ./.promd)
-├── workflow-parser.ts  # Parser for workflow strings
-├── prompt-parser.ts    # Parser for markdown files with frontmatter
-├── template-engine.ts  # Variable substitution engine
-├── executor.ts         # Workflow execution logic
-└── index.ts           # Exports
+├── cli.ts                 # Main CLI entry point with Commander.js
+├── backend.ts             # Abstract Backend class for prompt execution
+├── opencode-backend.ts    # OpenCode backend implementation
+├── subprocess-backend.ts  # Subprocess backend for external tools
+├── config.ts              # Config file loader (~/.promd, ./.promd)
+├── workflow-parser.ts     # Parser for workflow strings
+├── prompt-parser.ts       # Parser for markdown files with frontmatter
+├── template-engine.ts     # Variable substitution engine
+├── executor.ts            # Workflow execution logic
+└── index.ts               # Exports
 ```
 
 ## Key Features
 
-1. **Abstract Backend**: The `Backend` abstract class allows for different implementations (OpenAI, Anthropic, local models, etc.)
+1. **Multiple Backends**: 
+   - **OpenCode**: Full integration with OpenCode CLI (see [OPENCODE_BACKEND.md](OPENCODE_BACKEND.md))
+   - **Subprocess**: Execute external tools/scripts (see [STREAMING.md](STREAMING.md))
+   - **Mock**: Testing backend with simulated streaming
+   - **Custom**: Easy to implement custom backends (OpenAI, Anthropic, etc.)
 
 2. **Hierarchical Config**: Config files are loaded in priority order:
    - Global: `~/.promd`
@@ -52,6 +58,8 @@ src/
 3. **Workflow Parser**: Separate parser for workflow strings that can be extended with new syntax in the future
 
 4. **Template Engine**: Supports variable substitution with `{{variable}}` syntax
+
+5. **Real-time Streaming**: All backends support streaming output to stdout as it's generated
 
 ## Example Usage
 
@@ -157,6 +165,21 @@ export class OpenAIBackend extends Backend {
 }
 ```
 
+### Example: OpenCodeBackend
+
+The included `OpenCodeBackend` integrates with OpenCode:
+
+```typescript
+import { OpenCodeBackend } from './opencode-backend';
+
+const backend = new OpenCodeBackend({
+  model: 'anthropic/claude-sonnet-4',
+  workDir: process.cwd()
+});
+```
+
+See [OPENCODE_BACKEND.md](OPENCODE_BACKEND.md) for full documentation.
+
 ### Example: SubprocessBackend
 
 The included `SubprocessBackend` makes it easy to integrate with external tools:
@@ -178,7 +201,22 @@ See `examples/test-subprocess-backend.js` for a working example.
 Create `~/.promd`:
 
 ```yaml
-backend: openai
-defaultModel: gpt-4
-apiKey: your-api-key-here
+# Use OpenCode backend
+backend: opencode
+opencode:
+  model: anthropic/claude-sonnet-4
+  thinking: true
+
+# Or use subprocess backend
+# backend: subprocess
+# subprocess:
+#   command: python
+#   args:
+#     - run_llm.py
+#   useStdin: false
+
+# Or use mock backend for testing
+# backend: mock
 ```
+
+See `examples/.promd-opencode` for a complete configuration example.

@@ -1,7 +1,8 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
-import * as yaml from 'js-yaml';
+import * as fs from "fs";
+import * as path from "path";
+import * as os from "os";
+import * as yaml from "js-yaml";
+import { log } from "./logger";
 
 export interface Config {
   backend?: string;
@@ -10,7 +11,7 @@ export interface Config {
 }
 
 export class ConfigLoader {
-  private static readonly CONFIG_FILENAME = '.promd';
+  private static readonly CONFIG_FILENAME = ".promd";
 
   /**
    * Load configuration with priority:
@@ -32,7 +33,10 @@ export class ConfigLoader {
     configs.push(...dirConfigs);
 
     // Merge configs (later configs override earlier ones)
-    return this.mergeConfigs(configs);
+    const config = this.mergeConfigs(configs);
+    log.verbose("Final merged config:");
+    log.verbose(yaml.dump(config));
+    return config;
   }
 
   private static loadGlobalConfig(): Config | null {
@@ -77,11 +81,14 @@ export class ConfigLoader {
         return null;
       }
 
-      const content = fs.readFileSync(filePath, 'utf-8');
+      log.verbose(`Loading config from ${filePath}`);
+      const content = fs.readFileSync(filePath, "utf-8");
       const config = yaml.load(content) as Config;
       return config || {};
     } catch (error) {
-      console.warn(`Warning: Failed to load config from ${filePath}: ${error}`);
+      log.warn(
+        `Warning: Failed to load config from ${filePath}: ${error}`,
+      );
       return null;
     }
   }

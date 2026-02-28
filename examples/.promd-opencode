@@ -1,0 +1,33 @@
+# Example configuration for promptmd with OpenCode backend
+# Save this as ~/.promd or ./.promd
+
+# Backend selection
+backend: opencode
+
+# OpenCode-specific settings
+opencode:
+  # Model to use (optional, uses OpenCode default if not specified)
+  model: anthropic/claude-sonnet-4
+  
+  # Model variant (optional: high, max, minimal)
+  # variant: high
+  
+  # Agent to use (optional)
+  # agent: my-custom-agent
+  
+  # Show thinking blocks
+  # thinking: true
+  
+  # Output format: default or json
+  format: default
+
+# Alternative: Use subprocess backend
+# backend: subprocess
+# subprocess:
+#   command: python
+#   args:
+#     - run_llm.py
+#   useStdin: false
+
+# Alternative: Use mock backend for testing
+# backend: mock
