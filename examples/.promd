@@ -1,0 +1,8 @@
+# Example configuration file
+# Save as ~/.promd or ./.promd in your project directory
+
+backend: mock
+defaultModel: gpt-4
+
+# Add any custom configuration here
+# When you implement a real backend, you can add API keys, etc.
