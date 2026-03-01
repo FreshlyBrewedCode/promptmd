@@ -6,7 +6,7 @@
  * with OpenCode for prompt execution.
  */
 
-const { OpenCodeBackend } = require('../dist/opencode-backend');
+const { OpenCodeBackend } = require('../dist/backends/opencode');
 const { WorkflowExecutor } = require('../dist/executor');
 const { WorkflowParser } = require('../dist/workflow-parser');
 

@@ -4,72 +4,10 @@ import { Command } from "commander";
 import { ConfigLoader } from "./config";
 import { WorkflowParser } from "./workflow-parser";
 import { WorkflowExecutor } from "./executor";
-import { Backend, StreamCallback } from "./backend";
-import { OpenCodeBackend } from "./opencode-backend";
-import { SubprocessBackend } from "./subprocess-backend";
+import { createBackend } from "./backend-factory";
 import { log, setVerbose } from "./logger";
+import { extractCustomVariables } from "./utils";
 import * as fs from "fs";
-
-// Mock backend for development
-class MockBackend extends Backend {
-  async execute(
-    prompt: string,
-    outputSchema?: Record<string, any>,
-    streamCallback?: StreamCallback,
-  ) {
-    log.verbose("[Mock Backend] Executing prompt:");
-    log.verbose(prompt);
-
-    if (outputSchema) {
-      log.verbose("[Mock Backend] Expected output schema:");
-      log.verbose(JSON.stringify(outputSchema, null, 2));
-
-      // Generate mock structured output
-      const structured: Record<string, any> = {};
-      for (const [key, value] of Object.entries(outputSchema)) {
-        structured[key] = `mock_${key}_value`;
-      }
-
-      const content = JSON.stringify(structured, null, 2);
-
-      // Simulate streaming if callback provided
-      if (streamCallback?.onChunk) {
-        // Stream character by character with small delay
-        for (const char of content) {
-          streamCallback.onChunk(char);
-          await new Promise((resolve) => setTimeout(resolve, 10));
-        }
-        streamCallback.onChunk("\n");
-        streamCallback.onComplete?.();
-      }
-
-      return {
-        content,
-        structured,
-      };
-    }
-
-    const content = `Mock response for prompt: ${prompt.substring(0, 50)}...`;
-
-    // Simulate streaming if callback provided
-    if (streamCallback?.onChunk) {
-      // Stream word by word with small delay
-      const words = content.split(" ");
-      for (let i = 0; i < words.length; i++) {
-        streamCallback.onChunk(
-          words[i] + (i < words.length - 1 ? " " : ""),
-        );
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-      streamCallback.onChunk("\n");
-      streamCallback.onComplete?.();
-    }
-
-    return {
-      content,
-    };
-  }
-}
 
 async function main() {
   const program = new Command();
@@ -88,6 +26,7 @@ async function main() {
       'Workflow to execute (e.g., "weather" or "weather > plan-activities")',
     )
     .option("-v, --verbose", "Enable verbose output")
+    .option("-b, --backend <name>", "Backend to use (overrides config)")
     .option("--count <number>", "Number of loop iterations")
     .option("--exitOn <condition>", "Exit condition for loop")
     .allowUnknownOption(true) // Allow dynamic options like --city Hamburg
@@ -116,56 +55,13 @@ async function main() {
           (fs.existsSync(workflow) && fs.statSync(workflow).isDirectory());
 
         // Collect custom variables from unknown options
-        // Parse process.argv manually for unknown options
-        const variables: Record<string, any> = {};
+        const variables = extractCustomVariables(options);
 
-        for (let i = 0; i < process.argv.length; i++) {
-          const arg = process.argv[i];
-          if (arg.startsWith("--") && i + 1 < process.argv.length) {
-            const key = arg.substring(2);
-            const value = process.argv[i + 1];
-
-            // Skip known options
-            if (
-              key !== "count" &&
-              key !== "exitOn" &&
-              key !== "verbose" &&
-              !value.startsWith("--")
-            ) {
-              variables[key] = value;
-              i++; // Skip the value in next iteration
-            }
-          }
-        }
-
-        // Initialize backend based on config
-        let backend: Backend;
-        const backendType = config.backend || "mock";
-
-        if (backendType === "opencode") {
-          log.verbose("Using OpenCode backend");
-          backend = new OpenCodeBackend({
-            model: config.opencode?.model,
-            workDir: config.opencode?.workDir || process.cwd(),
-            agent: config.opencode?.agent,
-            format: config.opencode?.format || "default",
-            thinking: config.opencode?.thinking || false,
-            variant: config.opencode?.variant,
-            env: config.opencode?.env,
-          });
-        } else if (backendType === "subprocess") {
-          log.verbose("Using Subprocess backend");
-          backend = new SubprocessBackend({
-            command: config.subprocess?.command || "echo",
-            args: config.subprocess?.args || [],
-            cwd: config.subprocess?.cwd,
-            env: config.subprocess?.env,
-            useStdin: config.subprocess?.useStdin || false,
-          });
-        } else {
-          log.verbose("Using Mock backend");
-          backend = new MockBackend();
-        }
+        // Initialize backend using factory
+        log.verbose(
+          `Using backend: ${options.backend || config.backend || "mock"}`,
+        );
+        const backend = createBackend(config, options.backend);
 
         const executor = new WorkflowExecutor(backend);
 
@@ -245,6 +141,7 @@ async function main() {
       "Exit condition (string to search for in output)",
     )
     .option("-v, --verbose", "Enable verbose output")
+    .option("-b, --backend <name>", "Backend to use (overrides config)")
     .allowUnknownOption(true)
     .action(async (workflow, options) => {
       try {
@@ -255,56 +152,14 @@ async function main() {
         const config = ConfigLoader.load();
         log.verbose("Configuration loaded");
 
-        // Collect custom variables from process.argv
-        const variables: Record<string, any> = {};
+        // Collect custom variables from unknown options
+        const variables = extractCustomVariables(options);
 
-        for (let i = 0; i < process.argv.length; i++) {
-          const arg = process.argv[i];
-          if (arg.startsWith("--") && i + 1 < process.argv.length) {
-            const key = arg.substring(2);
-            const value = process.argv[i + 1];
-
-            // Skip known options
-            if (
-              key !== "count" &&
-              key !== "exitOn" &&
-              key !== "verbose" &&
-              !value.startsWith("--")
-            ) {
-              variables[key] = value;
-              i++; // Skip the value in next iteration
-            }
-          }
-        }
-
-        // Initialize backend based on config
-        let backend: Backend;
-        const backendType = config.backend || "mock";
-
-        if (backendType === "opencode") {
-          log.verbose("Using OpenCode backend");
-          backend = new OpenCodeBackend({
-            model: config.opencode?.model,
-            workDir: config.opencode?.workDir || process.cwd(),
-            agent: config.opencode?.agent,
-            format: config.opencode?.format || "default",
-            thinking: config.opencode?.thinking || false,
-            variant: config.opencode?.variant,
-            env: config.opencode?.env,
-          });
-        } else if (backendType === "subprocess") {
-          log.verbose("Using Subprocess backend");
-          backend = new SubprocessBackend({
-            command: config.subprocess?.command || "echo",
-            args: config.subprocess?.args || [],
-            cwd: config.subprocess?.cwd,
-            env: config.subprocess?.env,
-            useStdin: config.subprocess?.useStdin || false,
-          });
-        } else {
-          log.verbose("Using Mock backend");
-          backend = new MockBackend();
-        }
+        // Initialize backend using factory
+        log.verbose(
+          `Using backend: ${options.backend || config.backend || "mock"}`,
+        );
+        const backend = createBackend(config, options.backend);
 
         const executor = new WorkflowExecutor(backend);
 

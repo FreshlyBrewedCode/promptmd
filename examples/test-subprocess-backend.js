@@ -6,7 +6,7 @@
  * with external LLM tools or scripts.
  */
 
-const { SubprocessBackend } = require('../dist/subprocess-backend');
+const { SubprocessBackend } = require('../dist/backends/subprocess');
 const { WorkflowExecutor } = require('../dist/executor');
 const { WorkflowParser } = require('../dist/workflow-parser');
 

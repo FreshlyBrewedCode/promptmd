@@ -1,6 +1,6 @@
-import { Backend, PromptResult, StreamCallback } from './backend';
+import { Backend, PromptResult, StreamCallback } from '../backend';
 import { spawn } from 'child_process';
-import { log } from './logger';
+import { log } from '../logger';
 
 /**
  * SubprocessBackend - Execute prompts by invoking a subprocess
