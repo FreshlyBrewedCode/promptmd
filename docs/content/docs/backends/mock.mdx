@@ -1,0 +1,19 @@
+---
+title: Mock
+---
+
+The `mock` backend does not call any AI provider.
+
+It is useful for:
+
+- Testing that your workflow wiring works
+- Checking templates and variable passing
+- Running demos without external dependencies
+
+## Config
+
+```yaml title=".promd"
+backend: mock
+```
+
+If a prompt file defines an `output:` schema, the mock backend returns a JSON object with placeholder values like `mock_<key>_value`.

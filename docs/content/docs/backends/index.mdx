@@ -1,0 +1,24 @@
+---
+title: Backends
+icon: Server
+---
+
+Promptmd can run prompts using different backends.
+
+- `opencode` (recommended): runs prompts via the OpenCode CLI with streaming
+- `subprocess`: runs prompts by spawning a command you control
+- `mock`: no AI calls; useful for trying out workflow mechanics
+
+Pick a backend in a `.promd` config file (project or global) or override with `--backend`.
+
+```yaml title=".promd"
+backend: opencode
+opencode:
+  model: anthropic/claude-sonnet-4
+```
+
+Backend docs:
+
+- [Opencode](/docs/backends/opencode)
+- [Subprocess](/docs/backends/subprocess)
+- [Mock](/docs/backends/mock)

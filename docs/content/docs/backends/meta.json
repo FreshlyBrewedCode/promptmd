@@ -1,0 +1,12 @@
+{
+    "title": "Backends",
+    "icon": "Sparkles",
+    "pages": [
+        "---Integrations---",
+        "...",
+        "---Built-in---",
+        "subprocess",
+        "mock"
+    ],
+    "defaultOpen": true
+}

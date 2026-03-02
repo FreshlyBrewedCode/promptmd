@@ -1,0 +1,38 @@
+---
+title: Troubleshooting
+description: Common issues and fixes
+icon: Wrench
+---
+
+## Use verbose logging
+
+```bash
+promd -v weather
+```
+
+This helps you see which `.promd` config files were loaded and which steps ran.
+
+## "opencode" not found / command fails
+
+- Ensure `opencode` is installed and on your `PATH`
+- If you set `opencode.attach`, ensure the target is reachable (default is `http://localhost:4096`)
+
+## Prompt file not found
+
+- `promd weather` looks for `weather` (exact path) and then tries `weather.md`
+- Use a relative path if the file is not in your current directory: `promd prompts/weather`
+
+## Directory run says no prompt files found
+
+- Directory execution only includes files ending in `.md`
+- Files are executed in sorted filename order
+
+## Template variables not replaced
+
+- Variables come from CLI flags like `--city Berlin`
+- If you see `{{city}}` unchanged, run with `-v` and confirm the flag is being passed as `--city Berlin` (two tokens)
+
+## Structured output is empty or not parsed
+
+- For `subprocess`, print a single JSON object to stdout
+- For `opencode`, ensure your prompt clearly instructs the model to output a JSON object

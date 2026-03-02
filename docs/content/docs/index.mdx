@@ -1,0 +1,24 @@
+---
+title: Introduction
+icon: BookOpen
+---
+
+Promptmd is a small CLI that runs prompts from Markdown files.
+
+You write prompts as `.md` files, then run them with `promd`. You can:
+
+- Chain multiple prompts together with `>`
+- Pass variables from the CLI (like `--city Berlin`) and reference them as `{{city}}`
+- Feed the previous step output into the next step as `{{input}}`
+- Ask for structured (JSON) output using YAML frontmatter
+- Run a whole directory of prompt files in order
+- Loop a workflow until a condition is met
+
+Get started:
+
+- [Quick Start](/docs/quick-start)
+- [Prompts & Templates](/docs/prompts)
+- [Workflows & Chaining](/docs/workflows)
+- [Configuration](/docs/configuration)
+- [CLI Reference](/docs/cli)
+- [Backends](/docs/backends)

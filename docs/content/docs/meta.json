@@ -1,0 +1,17 @@
+{
+    "title": "Docs",
+    "pages": [
+        "---Getting Started---",
+        "index",
+        "quick-start",
+        "---Concepts---",
+        "prompts",
+        "workflows",
+        "backends",
+        "---Reference---",
+        "configuration",
+        "cli",
+        "troubleshooting"
+    ],
+    "defaultOpen": true
+}

@@ -1,0 +1,65 @@
+---
+title: Configuration
+description: Configure backends with .promd
+icon: Settings
+---
+
+Promptmd reads YAML config from `.promd` files.
+
+## Where config is loaded from
+
+Configs are merged in this order (later overrides earlier):
+
+1. `~/.promd`
+2. Any `.promd` files in parent directories
+3. `./.promd` (current directory)
+
+## Minimal config
+
+```yaml title=".promd"
+backend: opencode
+```
+
+You can override config on the command line:
+
+```bash
+promd weather --backend subprocess
+```
+
+## OpenCode backend config
+
+```yaml title=".promd"
+backend: opencode
+
+opencode:
+  model: anthropic/claude-sonnet-4
+  attach: http://localhost:4096
+  thinking: false
+  # continueSession: true
+  # sessionId: abc123
+  # fork: true
+  # agent: my-agent
+  # variant: high
+  # format: default
+  # env:
+  #   OPENCODE_SOMETHING: value
+```
+
+## Subprocess backend config
+
+```yaml title=".promd"
+backend: subprocess
+
+subprocess:
+  command: python3
+  args:
+    - ./run_llm.py
+  # If true, promptmd writes the prompt to stdin.
+  # If false, the prompt is appended as the last CLI argument.
+  useStdin: false
+
+  # Optional
+  # cwd: ./somewhere
+  # env:
+  #   MY_API_KEY: "..."
+```

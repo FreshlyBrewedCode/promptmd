@@ -1,0 +1,52 @@
+---
+title: Workflows
+description: Chain prompts, run directories, and reuse output
+icon: GitBranch
+---
+
+A workflow is one or more prompt steps.
+
+## Single step
+
+```bash
+promd weather
+```
+
+If you omit the extension, promptmd tries `weather.md`.
+
+## Chaining with `>`
+
+Chain steps by separating them with `>` (quote the string in your shell):
+
+```bash
+promd "weather > plan-activities"
+```
+
+Each step receives the previous output as `{{input}}`.
+
+## Run a directory
+
+Pass a directory path (or `.`) to execute all `.md` files in that directory, sorted by filename:
+
+```bash
+promd .
+promd ./my-workflow
+```
+
+Tip: prefix filenames with numbers if you want an explicit order, e.g. `01-fetch.md`, `02-summarize.md`.
+
+## Directory as a step
+
+In a chain, a step can also be a directory. The next step receives the last prompt output produced by that directory.
+
+```bash
+promd "./my-workflow > final-report"
+```
+
+## Looping
+
+Use the `loop` subcommand to run a workflow multiple times, optionally stopping early when the output contains a string.
+
+```bash
+promd loop --count 10 --exitOn "Complete" ./my-workflow
+```

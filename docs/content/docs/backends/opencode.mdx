@@ -1,0 +1,54 @@
+---
+title: Opencode
+---
+
+The `opencode` backend executes prompts by running the `opencode` CLI.
+
+It is the most convenient way to get streaming output without writing any glue code.
+
+## Prerequisites
+
+- `opencode` is installed and available on your `PATH`
+- Your OpenCode setup is already authenticated/configured (see OpenCode docs)
+
+## Config
+
+Create a `.promd` file (in your project or in `~/.promd`):
+
+```yaml title=".promd"
+backend: opencode
+
+opencode:
+  # Optional: provider/model
+  model: anthropic/claude-sonnet-4
+
+  # Optional: connect to an existing OpenCode instance
+  # (promptmd defaults to http://localhost:4096)
+  attach: http://localhost:4096
+
+  # Optional: show thinking blocks (if supported by your model)
+  thinking: false
+
+  # Optional: pick a model variant
+  # variant: high
+
+  # Optional: run OpenCode in a specific directory
+  # workDir: .
+```
+
+## Structured output
+
+If your prompt file has an `output:` schema in frontmatter, promptmd asks OpenCode for JSON events and then tries to parse a JSON object out of the assistant text.
+
+```md title="weather-structured.md"
+---
+output:
+  temperature: "forecasted temperature in celsius"
+  rain: "will it rain? (yes/no)"
+---
+Check the weather in {{city}} for tomorrow.
+```
+
+```bash
+promd weather-structured --city Berlin
+```

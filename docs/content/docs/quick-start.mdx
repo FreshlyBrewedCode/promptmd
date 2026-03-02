@@ -1,0 +1,38 @@
+---
+title: Quick Start
+description: Get started quickly
+icon: Rocket
+---
+
+Install promptmd globally:
+
+```npm
+npm install -g promptmd
+```
+
+Write your prompt in a markdown file:
+
+```md title="greetings.md"
+Hello there
+```
+
+Run a promptmd workflow using the CLI
+
+```bash
+promd greetings
+```
+
+<Callout>
+  You need opencode installed and configured for this example to work. For
+  more information see [backends](/docs/backends).
+</Callout>
+
+Pass variables from the CLI:
+
+```md title="weather.md"
+Check the weather in {{city}}.
+```
+
+```bash
+promd weather --city Berlin
+```

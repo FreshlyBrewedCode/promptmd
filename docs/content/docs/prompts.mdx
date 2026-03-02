@@ -1,0 +1,64 @@
+---
+title: Prompts & Templates
+description: Write prompt files and use variables
+icon: FileText
+---
+
+Promptmd runs Markdown files as prompts. A prompt file is just text, with optional YAML frontmatter.
+
+## Basic prompt
+
+```md title="greetings.md"
+Say hello to the user.
+```
+
+Run it:
+
+```bash
+promd greetings
+```
+
+## Variables
+
+Any unknown `--flag value` passed to `promd` becomes a template variable.
+
+```md title="weather.md"
+Check the weather in {{city}}.
+```
+
+```bash
+promd weather --city Berlin
+```
+
+If a variable is missing, promptmd keeps the placeholder (and warns in verbose logs).
+
+## Using `{{input}}`
+
+When you chain prompts, the next step receives the previous step output in `{{input}}`.
+
+```md title="summarize.md"
+Summarize this in 3 bullet points:
+
+{{input}}
+```
+
+## Structured output (frontmatter)
+
+Add an `output:` section to tell the backend you want a JSON object back.
+
+```md title="extract.md"
+---
+output:
+  title: "short title"
+  priority: "low|medium|high"
+---
+Read the following text and return JSON.
+
+{{input}}
+```
+
+In later steps, you can reference properties:
+
+```md title="next.md"
+Make a plan for: {{input.title}} (priority: {{input.priority}})
+```

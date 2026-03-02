@@ -1,0 +1,38 @@
+---
+title: Subprocess
+---
+
+The `subprocess` backend runs your prompts by spawning a command.
+
+This is useful when you already have an LLM runner script, want to call a local model, or need full control over auth and tooling.
+
+## Config
+
+```yaml title=".promd"
+backend: subprocess
+
+subprocess:
+  command: python3
+  args:
+    - ./run_llm.py
+  useStdin: false
+```
+
+## How the prompt is passed
+
+- `useStdin: false` (default): promptmd appends the prompt as the last command-line argument
+- `useStdin: true`: promptmd writes the prompt to stdin
+
+## Streaming
+
+Whatever your command writes to stdout is streamed to the terminal in real-time.
+
+## Structured output
+
+If your prompt file defines an `output:` schema, promptmd will try to parse your subprocess stdout as JSON.
+
+That means your command should print a single JSON object to stdout.
+
+```json
+{"title":"...","priority":"high"}
+```
