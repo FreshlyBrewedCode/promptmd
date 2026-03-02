@@ -3,6 +3,8 @@ import { Workflow } from './workflow-parser';
 import { PromptFileParser } from './prompt-parser';
 import { TemplateEngine } from './template-engine';
 import { log } from './logger';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export interface ExecutionOptions {
   variables?: Record<string, any>;
@@ -24,6 +26,37 @@ export class WorkflowExecutor {
   constructor(private backend: Backend) {}
 
   /**
+   * Validate and resolve a path from a workflow step
+   * - If path has no extension, checks if it's a directory first, then tries .md extension
+   * - Handles relative paths
+   * - Returns object with resolved path and whether it's a directory
+   */
+  private validateAndResolvePath(stepPath: string): { resolvedPath: string; isDirectory: boolean } {
+    const resolvedPath = path.resolve(stepPath);
+    
+    // Check if path exists as-is
+    if (fs.existsSync(resolvedPath)) {
+      const stats = fs.statSync(resolvedPath);
+      if (stats.isDirectory()) {
+        return { resolvedPath, isDirectory: true };
+      }
+      // File exists with exact path
+      return { resolvedPath, isDirectory: false };
+    }
+
+    // If no extension, try adding .md
+    if (!path.extname(stepPath)) {
+      const withMdExtension = `${resolvedPath}.md`;
+      if (fs.existsSync(withMdExtension)) {
+        return { resolvedPath: withMdExtension, isDirectory: false };
+      }
+    }
+
+    // Path doesn't exist, return as-is and let it fail with proper error later
+    return { resolvedPath, isDirectory: false };
+  }
+
+  /**
    * Execute a workflow
    */
   async execute(workflow: Workflow, options: ExecutionOptions = {}): Promise<ExecutionResult> {
@@ -43,8 +76,31 @@ export class WorkflowExecutor {
 
     for (const step of workflow.steps) {
       try {
+        // Validate and resolve the path
+        const { resolvedPath, isDirectory } = this.validateAndResolvePath(step.path);
+
+        // If it's a directory, execute all prompts in the directory
+        if (isDirectory) {
+          const dirResult = await this.executeDirectory(resolvedPath, { ...options, variables });
+          if (!dirResult.success) {
+            return dirResult;
+          }
+          results.push(...dirResult.results);
+          
+          // Update variables with the last result
+          if (dirResult.results.length > 0) {
+            const lastResult = dirResult.results[dirResult.results.length - 1];
+            if (lastResult.structured) {
+              variables.input = lastResult.structured;
+            } else {
+              variables.input = lastResult.content;
+            }
+          }
+          continue;
+        }
+
         // Load prompt file
-        const promptFile = PromptFileParser.parse(step.prompt);
+        const promptFile = PromptFileParser.parse(resolvedPath);
 
         // Render template with current variables
         const renderedPrompt = TemplateEngine.render(promptFile.content, variables);
@@ -73,7 +129,7 @@ export class WorkflowExecutor {
           variables.input = result.content;
         }
       } catch (error) {
-        log.error(`Error executing step '${step.prompt}': ` + error);
+        log.error(`Error executing step '${step.path}': ` + error);
         return {
           success: false,
           results

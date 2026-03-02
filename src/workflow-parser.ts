@@ -1,5 +1,5 @@
 export interface WorkflowStep {
-  prompt: string;
+  path: string;
 }
 
 export interface Workflow {
@@ -10,11 +10,11 @@ export class WorkflowParser {
   /**
    * Parse a workflow string into a structured workflow
    * Supports:
-   * - Single prompt: "weather"
-   * - Chained prompts: "weather > plan-activities"
-   * - Directory: "." or "./my-workflow"
+   * - Single path: "weather" or "prompts/weather.md"
+   * - Chained paths: "weather > plan-activities"
+   * - Directory: "." or "./my-workflow" or "prompts/init"
    * 
-   * Future syntax extensions can be added here
+   * Parser does not validate paths, just extracts them as strings
    */
   static parse(workflowString: string): Workflow {
     // Trim whitespace
@@ -23,24 +23,24 @@ export class WorkflowParser {
     // Check if it's a directory reference
     if (trimmed === '.' || trimmed.startsWith('./') || trimmed.startsWith('../')) {
       return {
-        steps: [{ prompt: trimmed }]
+        steps: [{ path: trimmed }]
       };
     }
 
-    // Split by '>' for chained prompts
+    // Split by '>' for chained paths
     if (trimmed.includes('>')) {
       const steps = trimmed
         .split('>')
         .map(s => s.trim())
         .filter(s => s.length > 0)
-        .map(prompt => ({ prompt }));
+        .map(path => ({ path }));
 
       return { steps };
     }
 
-    // Single prompt
+    // Single path
     return {
-      steps: [{ prompt: trimmed }]
+      steps: [{ path: trimmed }]
     };
   }
 
@@ -56,8 +56,8 @@ export class WorkflowParser {
 
     for (let i = 0; i < workflow.steps.length; i++) {
       const step = workflow.steps[i];
-      if (!step.prompt || step.prompt.trim().length === 0) {
-        errors.push(`Step ${i + 1} has an empty prompt`);
+      if (!step.path || step.path.trim().length === 0) {
+        errors.push(`Step ${i + 1} has an empty path`);
       }
     }
 
