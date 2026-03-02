@@ -34,5 +34,12 @@ export const log = {
   },
   header: (message: string) => {
     console.log(chalk.bold.white(message));
+  },
+  step: (message: string, filePath?: string) => {
+    if (filePath) {
+      console.log(chalk.yellow.italic(message) + chalk.yellow.italic(' ') + chalk.bold.yellow(filePath));
+    } else {
+      console.log(chalk.yellow.italic(message));
+    }
   }
 };

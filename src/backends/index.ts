@@ -1,8 +1,8 @@
-import { Backend } from '../backend';
-import { Config } from '../config';
-import { OpenCodeBackend } from './opencode';
-import { SubprocessBackend } from './subprocess';
-import { MockBackend } from './mock';
+import { Backend } from "../backend";
+import { Config } from "../config";
+import { OpenCodeBackend } from "./opencode";
+import { SubprocessBackend } from "./subprocess";
+import { MockBackend } from "./mock";
 
 /**
  * Type for a backend factory function
@@ -11,7 +11,7 @@ export type BackendFactory = (config: Config) => Backend;
 
 /**
  * Registry of available backends
- * 
+ *
  * Each backend is registered with a factory function that creates
  * an instance based on the provided configuration.
  */
@@ -20,27 +20,28 @@ export const BACKENDS: Record<string, BackendFactory> = {
     return new OpenCodeBackend({
       model: config.opencode?.model,
       workDir: config.opencode?.workDir || process.cwd(),
+      attach: config.opencode?.attach || "http://localhost:4096",
       agent: config.opencode?.agent,
-      format: config.opencode?.format || 'default',
+      format: config.opencode?.format || "default",
       thinking: config.opencode?.thinking || false,
       variant: config.opencode?.variant,
-      env: config.opencode?.env
+      env: config.opencode?.env,
     });
   },
 
   subprocess: (config: Config) => {
     return new SubprocessBackend({
-      command: config.subprocess?.command || 'echo',
+      command: config.subprocess?.command || "echo",
       args: config.subprocess?.args || [],
       cwd: config.subprocess?.cwd,
       env: config.subprocess?.env,
-      useStdin: config.subprocess?.useStdin || false
+      useStdin: config.subprocess?.useStdin || false,
     });
   },
 
   mock: (config: Config) => {
     return new MockBackend();
-  }
+  },
 };
 
 /**
@@ -58,6 +59,6 @@ export function isBackendRegistered(name: string): boolean {
 }
 
 // Re-export backend classes for convenience
-export { OpenCodeBackend } from './opencode';
-export { SubprocessBackend } from './subprocess';
-export { MockBackend } from './mock';
+export { OpenCodeBackend } from "./opencode";
+export { SubprocessBackend } from "./subprocess";
+export { MockBackend } from "./mock";

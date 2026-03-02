@@ -1,12 +1,17 @@
-import { Backend, PromptResult, StreamCallback } from '../backend';
-import { log } from '../logger';
+import {
+  Backend,
+  BackendExecuteOptions,
+  PromptResult,
+  StreamCallback,
+} from "../backend";
+import { log } from "../logger";
 
 /**
  * MockBackend - Mock backend for development and testing
- * 
+ *
  * This backend simulates AI responses without making actual API calls.
  * Useful for testing workflows and development.
- * 
+ *
  * Example usage:
  * ```typescript
  * const backend = new MockBackend();
@@ -14,11 +19,12 @@ import { log } from '../logger';
  */
 
 export class MockBackend extends Backend {
-  async execute(
-    prompt: string,
-    outputSchema?: Record<string, any>,
-    streamCallback?: StreamCallback,
-  ) {
+  async execute({
+    prompt,
+    outputSchema,
+    streamCallback,
+    stepName,
+  }: BackendExecuteOptions) {
     log.verbose("[Mock Backend] Executing prompt:");
     log.verbose(prompt);
 
