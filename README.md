@@ -1,4 +1,4 @@
-# Prompt MD
+# Promptmd
 
 Promptmd is a CLI tool for running, chaining, and looping prompts defined in markdown files with real-time streaming support.
 
@@ -14,12 +14,11 @@ Promptmd is a CLI tool for running, chaining, and looping prompts defined in mar
 
 ## Quick Start
 
-```bash
-npm install
-npm run build
-```
+Install globally:
 
-## Usage
+```bash
+npm install -g promptmd-cli
+```
 
 ### Simple prompt
 
