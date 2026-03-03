@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/FreshlyBrewedCode/promptmd/compare/v1.0.0...v1.1.0) (2026-03-03)
+
+
+### Features
+
+* support combined prompts ([bd3940f](https://github.com/FreshlyBrewedCode/promptmd/commit/bd3940f8728012225bf9f122a376d512d380feaa))
+
 # 1.0.0 (2026-03-03)
 
 
