@@ -1,6 +1,6 @@
 {
   "name": "promptmd-cli",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "CLI tool for running, chaining, and looping prompts defined in markdown files",
   "main": "dist/index.js",
   "bin": {
@@ -24,7 +24,9 @@
     "url": "https://github.com/FreshlyBrewedCode/promptmd"
   },
   "files": [
-    "dist", "package.json", "README.md"
+    "dist",
+    "package.json",
+    "README.md"
   ],
   "license": "MIT",
   "dependencies": {
