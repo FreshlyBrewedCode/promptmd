@@ -1,15 +1,17 @@
 {
-  "name": "promptmd",
+  "name": "promptmd-cli",
   "version": "0.1.0",
   "description": "CLI tool for running, chaining, and looping prompts defined in markdown files",
   "main": "dist/index.js",
   "bin": {
-    "promd": "dist/cli.js"
+    "promd": "dist/cli.js",
+    "promptmd": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "start": "node dist/cli.js"
+    "start": "node dist/cli.js",
+    "release": "semantic-release"
   },
   "keywords": [
     "cli",
@@ -17,7 +19,10 @@
     "markdown",
     "ai"
   ],
-  "author": "",
+  "author": "FreshlyBrewedCode",
+  "files": [
+    "dist", "package.json", "README.md"
+  ],
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.2",
@@ -26,8 +31,13 @@
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^12.0.6",
+    "@semantic-release/npm": "^13.1.5",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.11.0",
+    "semantic-release": "^25.0.3",
     "typescript": "^5.3.3"
   }
 }
