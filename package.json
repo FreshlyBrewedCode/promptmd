@@ -20,6 +20,9 @@
     "ai"
   ],
   "author": "FreshlyBrewedCode",
+  "repository": {
+    "url": "https://github.com/FreshlyBrewedCode/promptmd"
+  },
   "files": [
     "dist", "package.json", "README.md"
   ],
