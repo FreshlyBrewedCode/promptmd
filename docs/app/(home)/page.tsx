@@ -21,7 +21,7 @@ export default function HomePage() {
             className="text-left px-4 my-0 mx-auto w-100 z-10"
           >
             <Pre>
-              <code>npm install -g promptmd</code>
+              <code>npm install -g promptmd-cli</code>
             </Pre>
           </CodeBlock>
           <span className="absolute -z-20 opacity-80 inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#ffe5cb_0%,#eaa315_50%,#fcf9f5_100%)]" />
