@@ -55,7 +55,7 @@ promd examples/weather
 
 ### Chained Workflows
 ```bash
-promd "weather > plan-activities"
+promd weather plan-activities
 ```
 
 ### Subprocess Integration

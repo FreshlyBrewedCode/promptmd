@@ -43,17 +43,17 @@ promptmd/
 - Walks up directory tree to find all relevant configs
 
 ### 3. Workflow Parser (`src/workflow-parser.ts`)
-- Separate module for parsing workflow strings
+- Separate module for parsing workflow arguments
 - Supports:
-  - Single prompts: `"weather"`
-  - Chained prompts: `"weather > plan-activities"`
-  - Directory references: `"."` or `"./my-workflow"`
+  - Single prompts: `weather`
+  - Chained prompts: `weather plan-activities`
+  - Directory references: `.` or `./my-workflow`
 - Easy to extend with new syntax in the future
 - Includes validation
 
 ### 4. All README Features
 - ✅ Simple prompts
-- ✅ Chaining prompts with `>`
+- ✅ Chaining prompts with separate args
 - ✅ Variable substitution with `{{variable}}`
 - ✅ Structured output via frontmatter
 - ✅ Directory execution (all .md files)
@@ -75,12 +75,12 @@ node dist/cli.js weather
 
 ### Chained workflow
 ```bash
-node dist/cli.js "weather > plan-activities"
+node dist/cli.js weather plan-activities
 ```
 
 ### With variables
 ```bash
-node dist/cli.js "weather-structured > summary" --city Berlin
+node dist/cli.js weather-structured summary --city Berlin
 ```
 
 ### Loop execution
@@ -97,7 +97,7 @@ node dist/cli.js ./examples
 
 ### Modular Design
 Each component has a single responsibility:
-- `WorkflowParser`: Parse workflow strings
+- `WorkflowParser`: Parse workflow arguments
 - `PromptFileParser`: Parse markdown files
 - `TemplateEngine`: Handle variable substitution
 - `ConfigLoader`: Load configuration

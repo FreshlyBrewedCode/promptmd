@@ -7,14 +7,14 @@ icon: Terminal
 ## Run a workflow
 
 ```bash
-promd <workflow>
+promd <step> [step2 ...]
 ```
 
 Examples:
 
 ```bash
 promd weather
-promd "weather > plan-activities"
+promd weather plan-activities
 promd .
 ```
 
@@ -37,11 +37,11 @@ Use them as `{{city}}` and `{{units}}` in prompt files.
 ## Loop command
 
 ```bash
-promd loop --count <n> [--exitOn "text"] <workflow>
+promd loop --count <n> [--exitOn "text"] <step> [step2 ...]
 ```
 
 Example:
 
 ```bash
-promd loop --count 5 --exitOn "DONE" "step-1 > step-2"
+promd loop --count 5 --exitOn "DONE" step-1 step-2
 ```

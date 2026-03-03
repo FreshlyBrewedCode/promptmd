@@ -8,40 +8,23 @@ export interface Workflow {
 
 export class WorkflowParser {
   /**
-   * Parse a workflow string into a structured workflow
+   * Parse an array of path arguments into a structured workflow.
+   * Each argument is treated as a step in the workflow.
+   *
    * Supports:
-   * - Single path: "weather" or "prompts/weather.md"
-   * - Chained paths: "weather > plan-activities"
-   * - Directory: "." or "./my-workflow" or "prompts/init"
-   * 
-   * Parser does not validate paths, just extracts them as strings
+   * - Single path: ["weather"] or ["prompts/weather.md"]
+   * - Multiple paths (chained): ["weather", "plan-activities"]
+   * - Directory: ["."] or ["./my-workflow"] or ["prompts/init"]
+   *
+   * Parser does not validate paths, just extracts them as strings.
    */
-  static parse(workflowString: string): Workflow {
-    // Trim whitespace
-    const trimmed = workflowString.trim();
+  static parse(paths: string[]): Workflow {
+    const steps = paths
+      .map(p => p.trim())
+      .filter(p => p.length > 0)
+      .map(path => ({ path }));
 
-    // Check if it's a directory reference
-    if (trimmed === '.' || trimmed.startsWith('./') || trimmed.startsWith('../')) {
-      return {
-        steps: [{ path: trimmed }]
-      };
-    }
-
-    // Split by '>' for chained paths
-    if (trimmed.includes('>')) {
-      const steps = trimmed
-        .split('>')
-        .map(s => s.trim())
-        .filter(s => s.length > 0)
-        .map(path => ({ path }));
-
-      return { steps };
-    }
-
-    // Single path
-    return {
-      steps: [{ path: trimmed }]
-    };
+    return { steps };
   }
 
   /**

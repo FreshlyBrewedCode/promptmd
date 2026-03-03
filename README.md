@@ -33,7 +33,7 @@ promd weather
 ```sh
 echo "Check the weather in Berlin" > weather.md
 echo "Suggest activities in Berlin based on the provided weather forecast: {{input}}" > plan-activities.md
-promd "weather > plan-activities"
+promd weather plan-activities
 ```
 
 ### Use arguments
@@ -41,7 +41,7 @@ promd "weather > plan-activities"
 ```sh
 echo "Check the weather in {{city}}" > weather.md
 echo "Suggest activities in {{city}} based on the provided weather forecast: {{input}}" > plan-activities.md
-promd "weather > plan-activities" --city Hamburg
+promd weather plan-activities --city Hamburg
 ```
 
 ### Structured output via frontmatter
@@ -58,7 +58,7 @@ Check the weather in Berlin
 
 ```sh
 echo "Suggest activities in Berlin. Temperature: {{input.temperature}} Rain: {{input.rain}}" > plan-activities.md
-promd "weather > plan-activities" 
+promd weather plan-activities
 ```
 
 ### Chain all prompts in a directory

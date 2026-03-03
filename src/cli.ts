@@ -22,15 +22,15 @@ async function main() {
   // Main command for executing workflows
   program
     .argument(
-      "[workflow]",
-      'Workflow to execute (e.g., "weather" or "weather > plan-activities")',
+      "[steps...]",
+      'Workflow steps to execute (e.g., promd weather plan-activities)',
     )
     .option("-v, --verbose", "Enable verbose output")
     .option("-b, --backend <name>", "Backend to use (overrides config)")
     .option("--count <number>", "Number of loop iterations")
     .option("--exitOn <condition>", "Exit condition for loop")
     .allowUnknownOption(true) // Allow dynamic options like --city Hamburg
-    .action(async (workflow, options) => {
+    .action(async (steps: string[], options) => {
       try {
         // Set verbose flag
         setVerbose(options.verbose || false);
@@ -40,19 +40,20 @@ async function main() {
         log.verbose("Configuration loaded");
 
         // Parse workflow
-        if (!workflow) {
-          log.error("Error: Workflow argument is required");
-          log.info("Usage: promd <workflow> [options]");
+        if (!steps || steps.length === 0) {
+          log.error("Error: At least one workflow step is required");
+          log.info("Usage: promd <step> [step2 ...] [options]");
           log.info(
-            'Example: promd "weather > plan-activities" --city Hamburg',
+            "Example: promd weather plan-activities --city Hamburg",
           );
           process.exit(1);
         }
 
-        // Check if workflow is a directory
-        const isDirectory =
-          workflow === "." ||
-          (fs.existsSync(workflow) && fs.statSync(workflow).isDirectory());
+        // Check if workflow is a single directory reference
+        const isSingleDirectory =
+          steps.length === 1 &&
+          (steps[0] === "." ||
+            (fs.existsSync(steps[0]) && fs.statSync(steps[0]).isDirectory()));
 
         // Collect custom variables from unknown options
         const variables = extractCustomVariables(options);
@@ -66,7 +67,7 @@ async function main() {
         const executor = new WorkflowExecutor(backend);
 
         // Execute workflow
-        log.header(`\nExecuting workflow: ${workflow}\n`);
+        log.header(`\nExecuting workflow: ${steps.join(" > ")}\n`);
 
         // Setup execution options with streaming
         const executionOptions: any = {
@@ -79,13 +80,13 @@ async function main() {
         };
 
         let result;
-        if (isDirectory) {
+        if (isSingleDirectory) {
           result = await executor.executeDirectory(
-            workflow,
+            steps[0],
             executionOptions,
           );
         } else {
-          const parsedWorkflow = WorkflowParser.parse(workflow);
+          const parsedWorkflow = WorkflowParser.parse(steps);
           const validation = WorkflowParser.validate(parsedWorkflow);
 
           if (!validation.valid) {
@@ -134,7 +135,7 @@ async function main() {
   program
     .command("loop")
     .description("Execute workflow in a loop")
-    .argument("<workflow>", "Workflow to execute")
+    .argument("<steps...>", "Workflow steps to execute")
     .requiredOption("--count <number>", "Number of iterations")
     .option(
       "--exitOn <condition>",
@@ -143,7 +144,7 @@ async function main() {
     .option("-v, --verbose", "Enable verbose output")
     .option("-b, --backend <name>", "Backend to use (overrides config)")
     .allowUnknownOption(true)
-    .action(async (workflow, options) => {
+    .action(async (steps: string[], options) => {
       try {
         // Set verbose flag
         setVerbose(options.verbose || false);
@@ -164,7 +165,7 @@ async function main() {
         const executor = new WorkflowExecutor(backend);
 
         // Parse and validate workflow
-        const parsedWorkflow = WorkflowParser.parse(workflow);
+        const parsedWorkflow = WorkflowParser.parse(steps);
         const validation = WorkflowParser.validate(parsedWorkflow);
 
         if (!validation.valid) {
@@ -174,7 +175,7 @@ async function main() {
         }
 
         // Execute workflow with loop
-        log.header(`\nExecuting workflow in loop: ${workflow}\n`);
+        log.header(`\nExecuting workflow in loop: ${steps.join(" > ")}\n`);
 
         const result = await executor.execute(parsedWorkflow, {
           variables,

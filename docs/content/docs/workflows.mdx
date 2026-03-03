@@ -14,12 +14,12 @@ promd weather
 
 If you omit the extension, promptmd tries `weather.md`.
 
-## Chaining with `>`
+## Chaining steps
 
-Chain steps by separating them with `>` (quote the string in your shell):
+Pass multiple step names as separate arguments:
 
 ```bash
-promd "weather > plan-activities"
+promd weather plan-activities
 ```
 
 Each step receives the previous output as `{{input}}`.
@@ -40,7 +40,7 @@ Tip: prefix filenames with numbers if you want an explicit order, e.g. `01-fetch
 In a chain, a step can also be a directory. The next step receives the last prompt output produced by that directory.
 
 ```bash
-promd "./my-workflow > final-report"
+promd ./my-workflow final-report
 ```
 
 ## Looping

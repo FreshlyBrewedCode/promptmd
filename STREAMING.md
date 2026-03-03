@@ -37,7 +37,7 @@ Streaming is enabled by default in the CLI. Output is written to stdout in real-
 promd examples/weather
 
 # Chained prompts with streaming
-promd "weather > plan-activities"
+promd weather plan-activities
 
 # Loop with streaming
 promd examples/weather --count 3

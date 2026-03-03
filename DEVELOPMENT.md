@@ -55,7 +55,7 @@ src/
    - Global: `~/.promd`
    - Directory hierarchy: `../../.promd`, `../.promd`, `./.promd`
 
-3. **Workflow Parser**: Separate parser for workflow strings that can be extended with new syntax in the future
+3. **Workflow Parser**: Separate parser for workflow arguments that can be extended with new syntax in the future
 
 4. **Template Engine**: Supports variable substitution with `{{variable}}` syntax
 
@@ -75,7 +75,7 @@ promd weather
 ```bash
 echo "Check the weather in Berlin" > weather.md
 echo "Suggest activities based on: {{input}}" > plan-activities.md
-promd "weather > plan-activities"
+promd weather plan-activities
 ```
 
 ### With variables
@@ -99,7 +99,7 @@ Check the weather in Berlin
 Then:
 ```bash
 echo "Temperature: {{input.temperature}}, Rain: {{input.rain}}" > summary.md
-promd "weather > summary"
+promd weather summary
 ```
 
 ### Loop execution
