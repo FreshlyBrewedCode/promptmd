@@ -24,6 +24,24 @@ promd weather plan-activities
 
 Each step receives the previous output as `{{input}}`.
 
+## Combining files into one step
+
+Pass comma-separated file paths as a single argument to merge them into one step. The prompts are concatenated and sent as a single request, and the output flows into the next step as `{{input}}` just like any other step.
+
+```bash
+promd file1,file2 file3
+```
+
+Here `file1` and `file2` are combined into a single step, then the result is chained into `file3`.
+
+You can mix combined steps with regular steps in the same workflow:
+
+```bash
+promd context,instructions task final-report
+```
+
+Note: comma-separated paths only support files, not directories.
+
 ## Run a directory
 
 Pass a directory path (or `.`) to execute all `.md` files in that directory, sorted by filename:

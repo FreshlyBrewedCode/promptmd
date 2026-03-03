@@ -85,10 +85,62 @@ export class WorkflowExecutor {
 
     for (let i = 0; i < workflow.steps.length; i++) {
       const step = workflow.steps[i];
+      const stepLabel = step.paths.join(',');
       try {
-        // Validate and resolve the path
+        // Multi-path step: combine files into a single prompt (directories not supported)
+        if (step.paths.length > 1) {
+          log.step(`Step ${i + 1}/${workflow.steps.length} (combined):`, stepLabel);
+
+          const combinedParts: string[] = [];
+          let outputSchema: any = undefined;
+
+          for (const stepPath of step.paths) {
+            const { resolvedPath, isDirectory } = this.validateAndResolvePath(stepPath);
+            if (isDirectory) {
+              throw new Error(`Directories are not supported in combined steps: ${stepPath}`);
+            }
+            const promptFile = PromptFileParser.parse(resolvedPath);
+            const renderedContent = TemplateEngine.render(promptFile.content, variables);
+            combinedParts.push(renderedContent);
+            if (promptFile.outputSchema) {
+              outputSchema = promptFile.outputSchema;
+            }
+          }
+
+          const combinedPrompt = combinedParts.join('\n\n');
+          const stepName = step.paths.map(p => path.basename(p)).join('+');
+
+          // Setup streaming callback if enabled
+          const streamCallback: StreamCallback | undefined = options.stream
+            ? {
+                onChunk: options.onChunk,
+                onComplete: () => {},
+                onError: (error) => {
+                  log.error("Streaming error: " + error);
+                },
+              }
+            : undefined;
+
+          const result = await this.backend.execute({
+            prompt: combinedPrompt,
+            outputSchema,
+            streamCallback,
+            stepName,
+          });
+
+          results.push(result);
+
+          if (result.structured) {
+            variables.input = result.structured;
+          } else {
+            variables.input = result.content;
+          }
+          continue;
+        }
+
+        // Single-path step: existing logic (file or directory)
         const { resolvedPath, isDirectory } = this.validateAndResolvePath(
-          step.path,
+          step.paths[0],
         );
 
         log.step(`Step ${i + 1}/${workflow.steps.length}:`, resolvedPath);
@@ -158,7 +210,7 @@ export class WorkflowExecutor {
           variables.input = result.content;
         }
       } catch (error) {
-        log.error(`Error executing step '${step.path}': ` + error);
+        log.error(`Error executing step '${stepLabel}': ` + error);
         return {
           success: false,
           results,

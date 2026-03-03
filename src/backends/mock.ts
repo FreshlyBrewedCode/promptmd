@@ -42,11 +42,7 @@ export class MockBackend extends Backend {
 
       // Simulate streaming if callback provided
       if (streamCallback?.onChunk) {
-        // Stream character by character with small delay
-        for (const char of content) {
-          streamCallback.onChunk(char);
-          await new Promise((resolve) => setTimeout(resolve, 10));
-        }
+        streamCallback.onChunk(content);
         streamCallback.onChunk("\n");
         streamCallback.onComplete?.();
       }
@@ -57,19 +53,11 @@ export class MockBackend extends Backend {
       };
     }
 
-    const content = `Mock response for prompt: ${prompt.substring(0, 50)}...`;
+    const content = prompt + "\n";
 
     // Simulate streaming if callback provided
     if (streamCallback?.onChunk) {
-      // Stream word by word with small delay
-      const words = content.split(" ");
-      for (let i = 0; i < words.length; i++) {
-        streamCallback.onChunk(
-          words[i] + (i < words.length - 1 ? " " : ""),
-        );
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-      streamCallback.onChunk("\n");
+      streamCallback.onChunk(content);
       streamCallback.onComplete?.();
     }
 

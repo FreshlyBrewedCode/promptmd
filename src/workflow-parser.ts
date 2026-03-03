@@ -1,5 +1,5 @@
 export interface WorkflowStep {
-  path: string;
+  paths: string[];
 }
 
 export interface Workflow {
@@ -15,6 +15,7 @@ export class WorkflowParser {
    * - Single path: ["weather"] or ["prompts/weather.md"]
    * - Multiple paths (chained): ["weather", "plan-activities"]
    * - Directory: ["."] or ["./my-workflow"] or ["prompts/init"]
+   * - Combined paths (comma-separated): ["file1,file2"] runs both as one step
    *
    * Parser does not validate paths, just extracts them as strings.
    */
@@ -22,7 +23,9 @@ export class WorkflowParser {
     const steps = paths
       .map(p => p.trim())
       .filter(p => p.length > 0)
-      .map(path => ({ path }));
+      .map(arg => ({
+        paths: arg.split(',').map(p => p.trim()).filter(p => p.length > 0),
+      }));
 
     return { steps };
   }
@@ -39,8 +42,14 @@ export class WorkflowParser {
 
     for (let i = 0; i < workflow.steps.length; i++) {
       const step = workflow.steps[i];
-      if (!step.path || step.path.trim().length === 0) {
-        errors.push(`Step ${i + 1} has an empty path`);
+      if (!step.paths || step.paths.length === 0) {
+        errors.push(`Step ${i + 1} has no paths`);
+      } else {
+        for (const p of step.paths) {
+          if (!p || p.trim().length === 0) {
+            errors.push(`Step ${i + 1} has an empty path`);
+          }
+        }
       }
     }
 
