@@ -42,6 +42,14 @@ Summarize this in 3 bullet points:
 {{input}}
 ```
 
+```md title="story.md"
+Write a story about {{topic}}
+```
+
+```bash
+promd "story > summarize" --topic Bananas
+```
+
 ## Structured output (frontmatter)
 
 Add an `output:` section to tell the backend you want a JSON object back.
@@ -52,6 +60,7 @@ output:
   title: "short title"
   priority: "low|medium|high"
 ---
+
 Read the following text and return JSON.
 
 {{input}}
