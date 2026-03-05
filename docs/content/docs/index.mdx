@@ -10,6 +10,8 @@ You write prompts as `.md` files, then run them with `promd`. You can:
 - Chain multiple prompts together with `>`
 - Pass variables from the CLI (like `--city Berlin`) and reference them as `{{city}}`
 - Feed the previous step output into the next step as `{{input}}`
+- Use Mustache sections (`{{#var}}...{{/var}}`) for conditionals and list iteration
+- Include shared content with partials (`{{> file }}`)
 - Ask for structured (JSON) output using YAML frontmatter
 - Run a whole directory of prompt files in order
 - Loop a workflow until a condition is met

@@ -23,12 +23,10 @@ async function main() {
   program
     .argument(
       "[steps...]",
-      'Workflow steps to execute (e.g., promd weather plan-activities)',
+      "Workflow steps to execute (e.g., promd weather plan-activities)",
     )
     .option("-v, --verbose", "Enable verbose output")
     .option("-b, --backend <name>", "Backend to use (overrides config)")
-    .option("--count <number>", "Number of loop iterations")
-    .option("--exitOn <condition>", "Exit condition for loop")
     .allowUnknownOption(true) // Allow dynamic options like --city Hamburg
     .action(async (steps: string[], options) => {
       try {
@@ -53,7 +51,8 @@ async function main() {
         const isSingleDirectory =
           steps.length === 1 &&
           (steps[0] === "." ||
-            (fs.existsSync(steps[0]) && fs.statSync(steps[0]).isDirectory()));
+            (fs.existsSync(steps[0]) &&
+              fs.statSync(steps[0]).isDirectory()));
 
         // Collect custom variables from unknown options
         const variables = extractCustomVariables(options);
@@ -136,7 +135,7 @@ async function main() {
     .command("loop")
     .description("Execute workflow in a loop")
     .argument("<steps...>", "Workflow steps to execute")
-    .requiredOption("--count <number>", "Number of iterations")
+    .option("--count <number>", "Number of iterations")
     .option(
       "--exitOn <condition>",
       "Exit condition (string to search for in output)",
@@ -175,7 +174,9 @@ async function main() {
         }
 
         // Execute workflow with loop
-        log.header(`\nExecuting workflow in loop: ${steps.join(" > ")}\n`);
+        log.header(
+          `\nExecuting workflow in loop (${options.count} iterations): ${steps.join(" > ")}\n`,
+        );
 
         const result = await executor.execute(parsedWorkflow, {
           variables,
@@ -185,7 +186,7 @@ async function main() {
             process.stdout.write(chunk);
           },
           loop: {
-            count: parseInt(options.count, 10),
+            count: parseInt(options.count),
             exitOn: options.exitOn,
           },
         });

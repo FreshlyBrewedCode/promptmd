@@ -6,6 +6,8 @@ icon: FileText
 
 Promptmd runs Markdown files as prompts. A prompt file is just text, with optional YAML frontmatter.
 
+Templates use [Mustache](https://mustache.github.io/) syntax, so all standard Mustache features — sections, inverted sections, iteration, and partials — work out of the box.
+
 ## Basic prompt
 
 ```md title="greetings.md"
@@ -71,3 +73,91 @@ In later steps, you can reference properties:
 ```md title="next.md"
 Make a plan for: {{input.title}} (priority: {{input.priority}})
 ```
+
+## Sections
+
+Use a section block to conditionally include content when a variable is truthy, or to iterate over a list.
+
+### Conditional blocks
+
+```md title="report.md"
+---
+output:
+  urgent: true|false
+  summary: "brief summary"
+---
+
+Analyse this support ticket and classify it.
+
+{{input}}
+```
+
+```md title="respond.md"
+{{#urgent}}
+This is urgent — respond within 1 hour.
+{{/urgent}}
+
+{{^urgent}}
+Add to the backlog and respond within 3 business days.
+{{/urgent}}
+
+Ticket summary: {{summary}}
+```
+
+`{{#urgent}}...{{/urgent}}` renders its content when `urgent` is truthy.
+`{{^urgent}}...{{/urgent}}` renders its content when `urgent` is falsy or absent — the inverted (else) form.
+
+### Iterating over a list
+
+When the variable is an array, a section repeats once per item. Use `{{.}}` to reference the current item, or named keys for objects.
+
+```md title="plan.md"
+Here are the tasks to complete:
+
+{{#tasks}}
+- {{.}}
+{{/tasks}}
+```
+
+If `tasks` is `["Write tests", "Deploy", "Notify team"]`, this expands to:
+
+```
+Here are the tasks to complete:
+
+- Write tests
+- Deploy
+- Notify team
+```
+
+## Partials
+
+Use `{{> name }}` to include another prompt file inline. Promptmd loads `<name>.md` relative to the current working directory.
+
+```
+{{> name }}          →  ./name.md
+{{> shared/intro }}  →  ./shared/intro.md
+```
+
+This is useful for shared context blocks you want to reuse across prompts without repeating yourself.
+
+```md title="shared/persona.md"
+You are a concise technical writer. Always use plain language and short sentences.
+```
+
+```md title="summarize.md"
+{{> shared/persona }}
+
+Summarize the following in 3 bullet points:
+
+{{input}}
+```
+
+```md title="translate.md"
+{{> shared/persona }}
+
+Translate the following to French:
+
+{{input}}
+```
+
+If a partial file cannot be found, promptmd leaves the block empty and logs a warning.
