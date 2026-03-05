@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/FreshlyBrewedCode/promptmd/compare/v1.1.0...v1.2.0) (2026-03-05)
+
+
+### Features
+
+* add mustache template support ([16654e2](https://github.com/FreshlyBrewedCode/promptmd/commit/16654e26100bf10124f1fdddd7b4eda7ec4deefa))
+
 # [1.1.0](https://github.com/FreshlyBrewedCode/promptmd/compare/v1.0.0...v1.1.0) (2026-03-03)
 
 
